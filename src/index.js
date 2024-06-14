@@ -62,7 +62,7 @@ async function run() {
 							return true;
 						}
 					},
-					onAbuseLimit: (retryAfter, options) => { // does not retry, only logs a warning
+					onSecondaryRateLimit: (retryAfter, options) => { // does not retry, only logs a warning
 						toolkit.log.warn(`Abuse detected for request ${options.method} ${options.url}`);
 					},
 				},
