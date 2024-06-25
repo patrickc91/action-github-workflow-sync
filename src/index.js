@@ -70,7 +70,6 @@ async function run() {
 			}
 		);
 	}
-	
 
 	/**
 	 * Loop Handler.
@@ -160,17 +159,33 @@ async function run() {
 					toolkit.log( ' ' );
 				} );
 
-				if( DRY_RUN ) {
-					toolkit.log.warning( 'No Changes Are Pushed' );
+				if ( DRY_RUN )
+				{
+					// Check if changes are present. We want to share downstream updates to the Summary if so.
+					let hasChange = await toolkit.git.hasChange( local_path, true );
+
+					toolkit.log( 'No Changes Are Pushed' );
 					toolkit.log( 'Git Status' );
 					toolkit.log( await toolkit.git.stats( local_path ) );
 					toolkit.log( ' ' );
-				} else {
+					toolkit.log(hasChange);
+
+					if ( hasChange )
+					{
+						core.summary.addRaw(`DRY RUN - Changes Expected for Repo: ${repository}`);
+						core.summary.addEOL();
+						core.summary.addCodeBlock( await toolkit.git.stats( local_path ) ).write();
+					}
+				}
+				else
+				{
 					let haschange = await toolkit.git.hasChange( local_path, true );
 					let log_msg   = ( false === COMMIT_EACH_FILE ) ? 'Git Commit & Push Log' : 'Git Push Log';
-					if( '' === haschange && !COMMIT_EACH_FILE ) {
+
+					if ( haschange === '' && !COMMIT_EACH_FILE ) {
 						toolkit.log.success( 'No Changes Are Done :', '	' );
-					} else if( false !== haschange && !COMMIT_EACH_FILE ) {
+					}
+					else if ( false !== haschange && !COMMIT_EACH_FILE ) {
 						await helper.commitfile( local_path, SKIP_CI, COMMIT_MESSAGE );
 						modified.push( local_path );
 					}
@@ -178,8 +193,8 @@ async function run() {
 					toolkit.log.green( log_msg );
 					toolkit.log( '---------------------------------------------------' );
 					if( modified.length > 0 ) {
-						let pushh_status = await toolkit.git.push( local_path, git_url, false, true );
-						if( false !== pushh_status && 'created' !== status && PULL_REQUEST ) {
+						let push_status = await toolkit.git.push( local_path, git_url, false, true );
+						if( false !== push_status && 'created' !== status && PULL_REQUEST ) {
 							// create the pull request
 							const pull_request_resp = await finalOctokit.request(`POST /repos/${owner}/${repository}/pulls`, {
 								owner: owner, repo: repository,
