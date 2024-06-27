@@ -29669,7 +29669,7 @@ const RAW_WORKFLOW_FILES     = core.getInput( 'WORKFLOW_FILES' );
 const RETRY_MODE             = core.getInput( 'RETRY_MODE' );
 const WORKFLOW_FILES_DIR     = core.getInput( 'WORKFLOW_FILES_DIR' );
 const REPOSITORIES           = RAW_REPOSITORIES.split( '\n' );
-const WORKFLOW_FILES         = RAW_WORKFLOW_FILES.split( '\n' );
+const WORKFLOW_FILES         = RAW_WORKFLOW_FILES.split( ',' );
 const GITHUB_WORKSPACE       = toolkit.input.env( 'GITHUB_WORKSPACE' );
 const WORKSPACE              = toolkit.path.dirname( toolkit.path.dirname( GITHUB_WORKSPACE ) ) + '/workflow-sync/';
 
